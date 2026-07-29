@@ -1,0 +1,32 @@
+4 4 300
+1 21 0 53 3 55 2 34
+0 21 3 52 2 26 1 71
+3 39 1 42 2 31 0 12
+1 77 0 55 2 66 3 77
+// part 1 : basis power for operations 
+1 2 0 7 3 3 2 9 
+0 2 3 18 2 7 1 27 
+3 14 1 6 2 10 0 3 
+1 29 0 12 2 7 3 14 
+// part 2 : peak-power for operations
+1 5 0 21 3 12 2 17 
+0 3 3 22 2 2 1 16 
+3 9 1 5 2 7 0 4 
+1 36 0 6 2 12 3 19 
+// part 3 : peak-power's duration 
+1 1 0 10 3 17 2 8 
+0 6 3 13 2 6 1 7 
+3 3 1 7 2 3 0 1 
+1 16 0 10 2 11 3 4 
+// part 4 : Variable Power Threshold (nb Changes, starting date - available power)
+10
+0 78
+54 97
+129 68
+193 51
+268 41
+337 35
+406 32
+478 46
+554 64
+622 86
