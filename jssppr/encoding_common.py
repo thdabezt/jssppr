@@ -1,25 +1,27 @@
 from __future__ import annotations
 
-from functools import reduce
-from math import gcd
 from typing import Dict, Iterable, List
 
-from pysat.card import CardEnc, EncType as CardEncoding
 from pysat.formula import IDPool
+from pysat.pb import EncType as PBEncoding
+from pysat.pb import PBEnc
 
 from .model import Domains, Instance, Operation
 
 
+# The power constraint is translated by the binary-merge encoding, which PySAT
+# implements through pypblib. There is no fallback: a different pseudo-Boolean
+# translation would change the generated CNF, and results are only comparable
+# against the encoding they were produced with.
 try:
-    from pypblib import pblib as _pblib
-except ImportError:
-    _pblib = None
+    from pypblib import pblib as _pblib  # noqa: F401
+except ImportError as error:
+    raise ImportError(
+        "the binary-merge pseudo-Boolean encoding requires pypblib; "
+        "install it with `pip install pypblib`"
+    ) from error
 
-if _pblib is not None:
-    from pysat.pb import EncType as PBEncoding
-    from pysat.pb import PBEnc
-
-POWER_BOUND_ENCODING = "binmerge" if _pblib is not None else "kmtotalizer"
+POWER_BOUND_ENCODING = "binmerge"
 
 
 class ClauseCounter:
@@ -196,52 +198,17 @@ def add_power_bound(
     if len(literals) != len(weights):
         raise ValueError("power-bound literals and weights must have equal length")
 
-    terms = [
-        (literal, weight)
-        for literal, weight in zip(literals, weights)
-        if weight > 0
-    ]
-    if not terms:
-        return
-    if bound < 0:
-        clauses.add([])
-        return
-
-    divisor = reduce(gcd, (weight for _, weight in terms))
-    if divisor > 1:
-        terms = [(literal, weight // divisor) for literal, weight in terms]
-        bound //= divisor
-
-    bounded_terms = []
-    for literal, weight in terms:
-        if weight > bound:
-            clauses.add([-literal])
-        else:
-            bounded_terms.append((literal, weight))
-
-    if not bounded_terms or sum(weight for _, weight in bounded_terms) <= bound:
-        return
-
-    if _pblib is not None:
-        formula = PBEnc.leq(
-            lits=[literal for literal, _ in bounded_terms],
-            weights=[weight for _, weight in bounded_terms],
-            bound=bound,
-            top_id=variables.pool.top,
-            encoding=PBEncoding.binmerge,
-        )
-    else:
-        expanded = [
-            literal
-            for literal, weight in bounded_terms
-            for _ in range(weight)
-        ]
-        formula = CardEnc.atmost(
-            lits=expanded,
-            bound=bound,
-            top_id=variables.pool.top,
-            encoding=CardEncoding.kmtotalizer,
-        )
-
+    # pypblib normalises the constraint itself: it divides out the gcd of the
+    # weights, emits a unit clause for any literal whose weight exceeds the
+    # bound, and drops the constraint when the remaining weights cannot reach
+    # the bound. Doing any of that here first produces an identical CNF, so the
+    # terms are passed through unchanged.
+    formula = PBEnc.leq(
+        lits=literals,
+        weights=weights,
+        bound=bound,
+        top_id=variables.pool.top,
+        encoding=PBEncoding.binmerge,
+    )
     clauses.add_many(formula.clauses)
     variables.pool.top = max(variables.pool.top, formula.nv)
