@@ -14,22 +14,20 @@ def add_state_constraints(
         latest = variables.domains.latest[operation.id]
         for start in range(earliest, latest + 1):
             not_start = variables.start(operation.id, start, negative=True)
-            if operation.nominal_power + operation.peak_power > 0:
-                for offset in range(operation.peak_duration):
-                    clauses.add(
-                        [
-                            not_start,
-                            variables.state("peak", operation.id, start + offset),
-                        ]
-                    )
-            if operation.nominal_power > 0:
-                for offset in range(operation.peak_duration, operation.duration):
-                    clauses.add(
-                        [
-                            not_start,
-                            variables.state("base", operation.id, start + offset),
-                        ]
-                    )
+            for offset in range(operation.peak_duration):
+                clauses.add(
+                    [
+                        not_start,
+                        variables.state("peak", operation.id, start + offset),
+                    ]
+                )
+            for offset in range(operation.peak_duration, operation.duration):
+                clauses.add(
+                    [
+                        not_start,
+                        variables.state("base", operation.id, start + offset),
+                    ]
+                )
 
 
 def add_extra_constraints(
