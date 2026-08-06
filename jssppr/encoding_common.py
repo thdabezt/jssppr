@@ -9,10 +9,6 @@ from pysat.pb import PBEnc
 from .model import Domains, Instance, Operation
 
 
-# The power constraint is translated by the binary-merge encoding, which PySAT
-# implements through pypblib. There is no fallback: a different pseudo-Boolean
-# translation would change the generated CNF, and results are only comparable
-# against the encoding they were produced with.
 try:
     from pypblib import pblib as _pblib  # noqa: F401
 except ImportError as error:
@@ -198,11 +194,6 @@ def add_power_bound(
     if len(literals) != len(weights):
         raise ValueError("power-bound literals and weights must have equal length")
 
-    # pypblib normalises the constraint itself: it divides out the gcd of the
-    # weights, emits a unit clause for any literal whose weight exceeds the
-    # bound, and drops the constraint when the remaining weights cannot reach
-    # the bound. Doing any of that here first produces an identical CNF, so the
-    # terms are passed through unchanged.
     formula = PBEnc.leq(
         lits=literals,
         weights=weights,

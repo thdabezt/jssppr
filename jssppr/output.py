@@ -10,6 +10,7 @@ from .model import SolveResult
 
 SUMMARY_FIELDS = [
     "instance",
+    "backend",
     "jobs",
     "machines",
     "operations",
@@ -22,7 +23,11 @@ SUMMARY_FIELDS = [
     "time_latest_sat",
     "time_unsat",
     "UB",
+    "horizon_mode",
     "makespan",
+    "optimal",
+    "best_bound",
+    "gap",
     "status",
 ]
 
@@ -65,6 +70,7 @@ def write_result(run_directory: Path, result: SolveResult) -> Dict[str, object]:
     data_lines = [
         f"instance={data['instance']}",
         f"status={data['status']}",
+        f"backend={data['backend']}",
         f"jobs={data['jobs']}",
         f"machines={data['machines']}",
         f"operations={data['operations']}",
@@ -72,6 +78,9 @@ def write_result(run_directory: Path, result: SolveResult) -> Dict[str, object]:
         f"pb_encoding_used={data['pb_encoding_used']}",
         f"UB={data['UB']}",
         f"best_makespan={data['makespan'] if data['makespan'] is not None else ''}",
+        f"optimal={data['optimal']}",
+        f"best_bound={data['best_bound']}",
+        f"gap={data['gap']}",
         f"vars={data['vars']}",
         f"clauses={data['clauses']}",
         f"time_total={data['solve_time']}",
@@ -87,17 +96,24 @@ def write_result(run_directory: Path, result: SolveResult) -> Dict[str, object]:
 
     log_lines = []
     for iteration in data.get("iterations", []):
-        if iteration["status"] == "SAT":
-            log_lines.append(
-                f"SAT bound={iteration['bound']} "
-                f"makespan={iteration['makespan']} "
-                f"iteration_time={iteration['iteration_time']:.6f} "
-                f"elapsed={iteration['elapsed']:.6f}"
-            )
+        if "bound" in iteration:
+            if iteration["status"] == "SAT":
+                log_lines.append(
+                    f"SAT bound={iteration['bound']} "
+                    f"makespan={iteration['makespan']} "
+                    f"iteration_time={iteration['iteration_time']:.6f} "
+                    f"elapsed={iteration['elapsed']:.6f}"
+                )
+            else:
+                log_lines.append(
+                    f"UNSAT bound={iteration['bound']} "
+                    f"proof_time={iteration['iteration_time']:.6f} "
+                    f"elapsed={iteration['elapsed']:.6f}"
+                )
         else:
             log_lines.append(
-                f"UNSAT bound={iteration['bound']} "
-                f"proof_time={iteration['iteration_time']:.6f} "
+                f"SOLUTION {iteration['solution']} "
+                f"objective={iteration['objective']} "
                 f"elapsed={iteration['elapsed']:.6f}"
             )
     (instance_directory / "log.txt").write_text(
@@ -108,8 +124,9 @@ def write_result(run_directory: Path, result: SolveResult) -> Dict[str, object]:
     if result.starts is not None:
         raw = {
             "instance": result.instance.name,
+            "backend": data["backend"],
             "horizon": result.instance.horizon,
-            "makespan": result.data["makespan"],
+            "makespan": data["makespan"],
             "starts": result.starts,
             "operations": _operations(result),
         }

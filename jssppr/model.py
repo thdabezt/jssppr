@@ -47,6 +47,17 @@ class Domains:
 
 
 @dataclass
+class Preparation:
+    dataset_instance: Instance
+    instance: Instance
+    domains: Domains
+    warm_start: List[List[int]] | None
+    data: Dict[str, object]
+    started: float
+    feasible: bool
+
+
+@dataclass
 class SolveResult:
     instance: Instance
     data: Dict[str, object]

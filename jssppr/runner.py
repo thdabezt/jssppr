@@ -3,11 +3,39 @@ from __future__ import annotations
 import argparse
 import datetime
 from pathlib import Path
-from typing import Iterable, List
+from typing import Callable, Iterable, List
 
 from . import config
+from .model import SolveResult
 from .output import write_error, write_result, write_summary
-from .solver import solve_instance
+
+
+BACKENDS = ("sat", "cplex_cp1", "cplex_cp2", "cplex_mip", "gurobi")
+
+
+def _backend() -> Callable[[str | Path], SolveResult]:
+    backend = str(config.BACKEND).lower()
+    if backend not in BACKENDS:
+        raise ValueError(
+            "unsupported backend {!r}; choose one of: {}".format(
+                config.BACKEND, ", ".join(BACKENDS)
+            )
+        )
+    if backend == "sat":
+        from .solver import solve_instance
+
+        return solve_instance
+    if backend == "cplex_mip":
+        from .cplex_mip_solver import solve_instance
+
+        return solve_instance
+    if backend == "gurobi":
+        from .gurobi_mip_solver import solve_instance
+
+        return solve_instance
+    from .cplex_cp_solver import solve_instance
+
+    return solve_instance
 
 
 def _instances(paths: Iterable[str | Path] | None) -> List[Path]:
@@ -30,6 +58,7 @@ def run(
     paths: Iterable[str | Path] | None = None,
     results_directory: str | Path | None = None,
 ) -> int:
+    solve_instance = _backend()
     inputs = _instances(paths)
     if not inputs:
         print(f"No .txt instances found in {Path(config.DATASET_DIR)}")
@@ -37,13 +66,13 @@ def run(
 
     root = Path(results_directory) if results_directory else Path(config.RESULTS_DIR)
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-    run_directory = root.resolve() / f"run_{timestamp}"
+    run_directory = root.resolve() / f"run_{timestamp}_{str(config.BACKEND).lower()}"
     run_directory.mkdir(parents=True, exist_ok=False)
 
     rows = []
     errors = 0
     for source in inputs:
-        print(f"[{source.name}] solving")
+        print(f"[{source.name}] solving with {str(config.BACKEND).lower()}")
         try:
             result = solve_instance(source)
             row = write_result(run_directory, result)

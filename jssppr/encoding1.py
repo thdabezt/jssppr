@@ -30,60 +30,6 @@ def add_state_constraints(
                 )
 
 
-def add_extra_constraints(
-    instance: Instance,
-    variables: Variables,
-    clauses: ClauseCounter,
-) -> None:
-    for operation in instance.operations:
-        earliest = variables.domains.earliest[operation.id]
-        latest = variables.domains.latest[operation.id]
-        for time in range(earliest, latest + 2):
-            order = variables.order(operation.id, time)
-            not_order = variables.order(operation.id, time, negative=True)
-            if operation.peak_duration > 0:
-                clauses.add(
-                    [
-                        not_order,
-                        variables.state("peak", operation.id, time - 1, negative=True),
-                    ]
-                )
-                clauses.add(
-                    [
-                        order,
-                        variables.state(
-                            "peak",
-                            operation.id,
-                            time + operation.peak_duration - 1,
-                            negative=True,
-                        ),
-                    ]
-                )
-            if operation.duration > operation.peak_duration:
-                clauses.add(
-                    [
-                        not_order,
-                        variables.state(
-                            "base",
-                            operation.id,
-                            time + operation.peak_duration - 1,
-                            negative=True,
-                        ),
-                    ]
-                )
-                clauses.add(
-                    [
-                        order,
-                        variables.state(
-                            "base",
-                            operation.id,
-                            time + operation.duration - 1,
-                            negative=True,
-                        ),
-                    ]
-                )
-
-
 def add_power_constraints(
     instance: Instance,
     variables: Variables,
