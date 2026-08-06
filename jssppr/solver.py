@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import List
+from typing import Callable, Dict, List, Optional
 
 from pysat.solvers import Solver
 
@@ -44,7 +44,10 @@ def _decode_starts(
     return starts
 
 
-def solve_instance(path: str | Path) -> SolveResult:
+def solve_instance(
+    path: str | Path,
+    checkpoint: Optional[Callable[[SolveResult], None]] = None,
+) -> SolveResult:
     preparation = prepare_instance(path, f"{config.SOLVER}-pb")
     instance = preparation.instance
     data = preparation.data
@@ -58,6 +61,37 @@ def solve_instance(path: str | Path) -> SolveResult:
     solver = Solver(name=str(config.SOLVER))
     clauses = ClauseCounter(solver)
 
+    def snapshot(
+        status: str,
+        makespan: Optional[int],
+        build_time: float,
+        first: Optional[float],
+        latest: Optional[float],
+        unsat: Optional[float],
+        iterations: List[Dict[str, object]],
+    ) -> Dict[str, object]:
+        verified = makespan is not None
+        current = dict(data)
+        current.update(
+            {
+                "status": status,
+                "verified": verified,
+                "optimal": verified and unsat is not None,
+                "makespan": makespan,
+                "vars": variables.pool.top,
+                "clauses": clauses.count,
+                "build_time": build_time,
+                "solve_time": time.perf_counter() - preparation.started,
+                "time_first_sat": first if first is not None else "",
+                "time_latest_sat": latest if latest is not None else "",
+                "time_unsat": unsat if unsat is not None else "",
+                "best_bound": makespan if unsat is not None else "",
+                "gap": 0.0 if verified and unsat is not None else "",
+                "iterations": list(iterations),
+            }
+        )
+        return current
+
     try:
         build_started = time.perf_counter()
         add_base_constraints(instance, variables, clauses)
@@ -70,7 +104,7 @@ def solve_instance(path: str | Path) -> SolveResult:
         time_first_sat = None
         time_latest_sat = None
         time_unsat = None
-        iterations = []
+        iterations: List[Dict[str, object]] = []
 
         while current_bound >= 0:
             add_makespan_bound(instance, variables, clauses, current_bound)
@@ -125,32 +159,33 @@ def solve_instance(path: str | Path) -> SolveResult:
                 f"makespan={candidate_makespan} "
                 f"iteration_time={iteration_time:.6f}s"
             )
+            if checkpoint is not None:
+                checkpoint(
+                    SolveResult(
+                        instance=instance,
+                        data=snapshot(
+                            "RUNNING",
+                            best_makespan,
+                            build_time,
+                            time_first_sat,
+                            time_latest_sat,
+                            None,
+                            iterations,
+                        ),
+                        starts=best_starts,
+                    )
+                )
             current_bound = candidate_makespan - 1
 
-        verified = best_starts is not None
-        status = "OK" if verified else "FAILED"
-
-        data.update(
-            {
-                "status": status,
-                "verified": verified,
-                "optimal": verified and time_unsat is not None,
-                "makespan": best_makespan,
-                "vars": variables.pool.top,
-                "clauses": clauses.count,
-                "build_time": build_time,
-                "solve_time": time.perf_counter() - preparation.started,
-                "time_first_sat": (
-                    time_first_sat if time_first_sat is not None else ""
-                ),
-                "time_latest_sat": (
-                    time_latest_sat if time_latest_sat is not None else ""
-                ),
-                "time_unsat": time_unsat if time_unsat is not None else "",
-                "best_bound": best_makespan if time_unsat is not None else "",
-                "gap": 0.0 if verified and time_unsat is not None else "",
-                "iterations": iterations,
-            }
+        status = "OK" if best_starts is not None else "FAILED"
+        data = snapshot(
+            status,
+            best_makespan,
+            build_time,
+            time_first_sat,
+            time_latest_sat,
+            time_unsat,
+            iterations,
         )
         return SolveResult(
             instance=instance,

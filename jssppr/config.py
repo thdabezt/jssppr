@@ -102,11 +102,16 @@ HEURISTIC_TIME_LIMIT = 5.0
 HEURISTIC_SEED = 0
 
 # Search limit
-# TIME_LIMIT_SECONDS is passed to CP Optimizer, CPLEX, and Gurobi as a per
-# instance limit. Reaching it returns the best incumbent found so far instead of
-# a proof, which is reported as optimal=False. The SAT backend has no time
-# limit: it runs the incremental loop of Algorithm 2 until UNSAT, which is also
-# its optimality proof.
+# TIME_LIMIT_SECONDS bounds the search for one instance, and None removes the
+# limit. Reaching it returns the best incumbent found so far instead of a proof,
+# which is reported as optimal=False.
+# CP Optimizer, CPLEX, and Gurobi take it as a native solver parameter. PySAT
+# cannot interrupt CaDiCaL from inside the process, so the SAT backend instead
+# solves each instance in a child process that is stopped at the limit. The
+# child rewrites its result after every improving makespan, so the best schedule
+# found so far survives being stopped and is reported with stop_cause
+# "time limit". A stopped SAT run is never marked optimal, because the UNSAT
+# proof it was working on never finished.
 TIME_LIMIT_SECONDS: Optional[float] = 3600.0
 
 # IBM CP Optimizer
