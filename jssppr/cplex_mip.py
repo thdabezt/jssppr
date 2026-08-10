@@ -5,8 +5,7 @@ from itertools import combinations
 from math import isfinite
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
-from .cplex_cp import compress_power_thresholds, effective_peak_duration
-from .model import Domains, Instance
+from .model import Domains, Instance, Operation
 
 
 SuboperationKey = Tuple[int, int]
@@ -100,6 +99,39 @@ def load_docplex_symbols() -> Dict[str, Any]:
         "ProgressClock": ProgressClock,
         "SolutionListener": SolutionListener,
     }
+
+
+def compress_power_thresholds(
+    power_thresholds: Sequence[int],
+    horizon: int,
+) -> List[Tuple[int, int, int]]:
+    if horizon < 0:
+        raise ValueError("horizon must be non-negative")
+    if horizon == 0:
+        return []
+    if not power_thresholds:
+        raise ValueError("power_thresholds cannot be empty")
+
+    def capacity_at(time_index: int) -> int:
+        index = min(time_index, len(power_thresholds) - 1)
+        return int(power_thresholds[index])
+
+    segments: List[Tuple[int, int, int]] = []
+    segment_start = 0
+    capacity = capacity_at(0)
+    for time_index in range(1, horizon):
+        next_capacity = capacity_at(time_index)
+        if next_capacity != capacity:
+            segments.append((segment_start, time_index, capacity))
+            segment_start = time_index
+            capacity = next_capacity
+    segments.append((segment_start, horizon, capacity))
+    return segments
+
+
+def effective_peak_duration(operation: Operation) -> int:
+    duration = max(0, int(operation.duration))
+    return min(duration, max(0, int(operation.peak_duration)))
 
 
 def expand_jssppr_entities(

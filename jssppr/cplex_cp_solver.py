@@ -6,15 +6,8 @@ from typing import Any, Dict, List, Optional
 
 from . import config
 from .cplex_cp import CplexCpModel, CplexCpUnavailableError, build_cplex_cp_model
-from .cplex_cp2 import build_cplex_cp2_model
 from .model import Instance, SolveResult
 from .preprocess import prepare_instance, verify
-
-
-BUILDERS = {
-    "cplex_cp1": build_cplex_cp_model,
-    "cplex_cp2": build_cplex_cp2_model,
-}
 
 
 def _extract_starts(
@@ -153,7 +146,7 @@ def solve_instance(path: str | Path) -> SolveResult:
     if not preparation.feasible:
         return SolveResult(instance=instance, data=data, starts=None)
 
-    built_model = BUILDERS[backend](
+    built_model = build_cplex_cp_model(
         instance,
         preparation.domains,
         preparation.warm_start,

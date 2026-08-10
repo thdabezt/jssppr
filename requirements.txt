@@ -2,7 +2,7 @@
 python-sat>=1.8.dev13
 pypblib>=0.0.4
 
-# Required for BACKEND = "cplex_cp1", "cplex_cp2", or "cplex_mip".
+# Required for BACKEND = "cplex_cp" or "cplex_mip".
 # docplex is on PyPI; the cplex package and the cpoptimizer executable come from
 # IBM CPLEX Optimization Studio and need a licence that fits the model size.
 # docplex>=2.25

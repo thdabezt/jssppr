@@ -14,7 +14,7 @@ from .model import SolveResult
 from .output import write_error, write_result, write_summary
 
 
-BACKENDS = ("sat", "cplex_cp1", "cplex_cp2", "cplex_mip", "gurobi")
+BACKENDS = ("sat", "cplex_cp", "cplex_mip", "gurobi")
 
 
 def _backend() -> Callable[[str | Path], SolveResult]:

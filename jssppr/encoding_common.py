@@ -10,7 +10,7 @@ from .model import Domains, Instance, Operation
 
 
 try:
-    from pypblib import pblib as _pblib  # noqa: F401
+    __import__("pypblib.pblib")
 except ImportError as error:
     raise ImportError(
         "the binary-merge pseudo-Boolean encoding requires pypblib; "
