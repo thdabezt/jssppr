@@ -87,6 +87,18 @@ def _search(built_model: CplexMipModel, started: float):
     details = model.solve_details
     if incumbent is None:
         incumbent = model.solution
+    if incumbent is not None and listener.solution_count == 0:
+        listener.solution_count = 1
+        elapsed = time.perf_counter() - started
+        timings["first"] = elapsed
+        timings["latest"] = elapsed
+        iterations.append(
+            {
+                "solution": listener.solution_count,
+                "objective": incumbent.objective_value,
+                "elapsed": elapsed,
+            }
+        )
 
     return incumbent, details, listener.solution_count, timings, iterations
 
