@@ -163,10 +163,10 @@ def prepare_instance(path: str | Path, solver: str) -> Preparation:
     dataset_instance = read_instance(path)
 
     horizon_mode = str(config.HORIZON).lower()
-    if horizon_mode not in ("heuristic", "cache", "safe", "dataset"):
+    if horizon_mode not in ("heuristic", "cache", "fixed", "safe", "dataset"):
         raise ValueError(
             f"unsupported horizon {config.HORIZON!r}; "
-            f"choose one of: heuristic, cache, safe, dataset"
+            f"choose one of: heuristic, cache, fixed, safe, dataset"
         )
 
     heuristic_ub = None
@@ -178,18 +178,34 @@ def prepare_instance(path: str | Path, solver: str) -> Preparation:
         instance = dataset_instance
         ub_source = "dataset"
         print(f"[{instance.name}] dataset horizon H={instance.horizon}")
-    elif horizon_mode == "cache":
-        cache = load_ub_cache(config.UB_CACHE_FILE)
-        if dataset_instance.name not in cache:
-            raise KeyError(
-                f"{dataset_instance.name} has no entry in "
-                f"{Path(config.UB_CACHE_FILE).name}"
+    elif horizon_mode in ("cache", "fixed"):
+        if horizon_mode == "cache":
+            cache = load_ub_cache(config.UB_CACHE_FILE)
+            if dataset_instance.name not in cache:
+                raise KeyError(
+                    f"{dataset_instance.name} has no entry in "
+                    f"{Path(config.UB_CACHE_FILE).name}"
+                )
+            heuristic_ub = cache[dataset_instance.name]
+        else:
+            if config.UPPER_BOUND is None:
+                raise ValueError(
+                    "horizon 'fixed' requires UPPER_BOUND; pass --upper-bound"
+                )
+            heuristic_ub = int(config.UPPER_BOUND)
+            if heuristic_ub <= 0:
+                raise ValueError("UPPER_BOUND must be positive")
+        available = len(dataset_instance.power_thresholds) - 1
+        if heuristic_ub > available:
+            raise ValueError(
+                f"upper bound {heuristic_ub} exceeds the "
+                f"{available} time units covered by the power profile of "
+                f"{dataset_instance.name}"
             )
-        heuristic_ub = cache[dataset_instance.name]
         instance = with_horizon(dataset_instance, heuristic_ub)
-        ub_source = "cache"
+        ub_source = horizon_mode
         if str(config.BACKEND).lower() == "sat":
-            print(f"[{instance.name}] cached UB={heuristic_ub}")
+            print(f"[{instance.name}] {ub_source} UB={heuristic_ub}")
         else:
             heuristic_started = time.perf_counter()
             warm_start, heuristic_iterations = _heuristic_warm_start(
@@ -198,7 +214,7 @@ def prepare_instance(path: str | Path, solver: str) -> Preparation:
             )
             heuristic_time = time.perf_counter() - heuristic_started
             print(
-                f"[{instance.name}] cached UB={heuristic_ub} "
+                f"[{instance.name}] {ub_source} UB={heuristic_ub} "
                 f"warm_start={'yes' if warm_start is not None else 'no'} "
                 f"time={heuristic_time:.6f}s"
             )

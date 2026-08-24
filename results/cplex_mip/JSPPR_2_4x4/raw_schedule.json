@@ -1,0 +1,226 @@
+{
+  "instance": "JSPPR_2_4x4.txt",
+  "backend": "cplex_mip",
+  "horizon": 475,
+  "makespan": 475,
+  "starts": [
+    [
+      0,
+      118,
+      222,
+      253
+    ],
+    [
+      0,
+      32,
+      72,
+      205
+    ],
+    [
+      0,
+      118,
+      300,
+      376
+    ],
+    [
+      32,
+      146,
+      224,
+      286
+    ]
+  ],
+  "operations": [
+    {
+      "id": 0,
+      "job": 0,
+      "operation": 0,
+      "machine": 0,
+      "start": 0,
+      "duration": 20,
+      "end": 20,
+      "nominal_power": 4,
+      "peak_power": 1,
+      "peak_duration": 2
+    },
+    {
+      "id": 1,
+      "job": 0,
+      "operation": 1,
+      "machine": 3,
+      "start": 118,
+      "duration": 87,
+      "end": 205,
+      "nominal_power": 41,
+      "peak_power": 22,
+      "peak_duration": 28
+    },
+    {
+      "id": 2,
+      "job": 0,
+      "operation": 2,
+      "machine": 1,
+      "start": 222,
+      "duration": 31,
+      "end": 253,
+      "nominal_power": 11,
+      "peak_power": 10,
+      "peak_duration": 9
+    },
+    {
+      "id": 3,
+      "job": 0,
+      "operation": 3,
+      "machine": 2,
+      "start": 253,
+      "duration": 17,
+      "end": 270,
+      "nominal_power": 4,
+      "peak_power": 3,
+      "peak_duration": 1
+    },
+    {
+      "id": 4,
+      "job": 1,
+      "operation": 0,
+      "machine": 2,
+      "start": 0,
+      "duration": 32,
+      "end": 32,
+      "nominal_power": 15,
+      "peak_power": 0,
+      "peak_duration": 0
+    },
+    {
+      "id": 5,
+      "job": 1,
+      "operation": 1,
+      "machine": 0,
+      "start": 32,
+      "duration": 24,
+      "end": 56,
+      "nominal_power": 1,
+      "peak_power": 1,
+      "peak_duration": 5
+    },
+    {
+      "id": 6,
+      "job": 1,
+      "operation": 2,
+      "machine": 1,
+      "start": 72,
+      "duration": 18,
+      "end": 90,
+      "nominal_power": 7,
+      "peak_power": 0,
+      "peak_duration": 0
+    },
+    {
+      "id": 7,
+      "job": 1,
+      "operation": 3,
+      "machine": 3,
+      "start": 205,
+      "duration": 81,
+      "end": 286,
+      "nominal_power": 5,
+      "peak_power": 15,
+      "peak_duration": 19
+    },
+    {
+      "id": 8,
+      "job": 2,
+      "operation": 0,
+      "machine": 1,
+      "start": 0,
+      "duration": 72,
+      "end": 72,
+      "nominal_power": 18,
+      "peak_power": 31,
+      "peak_duration": 7
+    },
+    {
+      "id": 9,
+      "job": 2,
+      "operation": 1,
+      "machine": 2,
+      "start": 118,
+      "duration": 23,
+      "end": 141,
+      "nominal_power": 10,
+      "peak_power": 5,
+      "peak_duration": 5
+    },
+    {
+      "id": 10,
+      "job": 2,
+      "operation": 2,
+      "machine": 0,
+      "start": 300,
+      "duration": 58,
+      "end": 358,
+      "nominal_power": 17,
+      "peak_power": 9,
+      "peak_duration": 5
+    },
+    {
+      "id": 11,
+      "job": 2,
+      "operation": 3,
+      "machine": 3,
+      "start": 376,
+      "duration": 99,
+      "end": 475,
+      "nominal_power": 21,
+      "peak_power": 3,
+      "peak_duration": 12
+    },
+    {
+      "id": 12,
+      "job": 3,
+      "operation": 0,
+      "machine": 2,
+      "start": 32,
+      "duration": 86,
+      "end": 118,
+      "nominal_power": 39,
+      "peak_power": 12,
+      "peak_duration": 21
+    },
+    {
+      "id": 13,
+      "job": 3,
+      "operation": 1,
+      "machine": 1,
+      "start": 146,
+      "duration": 76,
+      "end": 222,
+      "nominal_power": 22,
+      "peak_power": 12,
+      "peak_duration": 16
+    },
+    {
+      "id": 14,
+      "job": 3,
+      "operation": 2,
+      "machine": 0,
+      "start": 224,
+      "duration": 45,
+      "end": 269,
+      "nominal_power": 20,
+      "peak_power": 7,
+      "peak_duration": 11
+    },
+    {
+      "id": 15,
+      "job": 3,
+      "operation": 3,
+      "machine": 3,
+      "start": 286,
+      "duration": 90,
+      "end": 376,
+      "nominal_power": 19,
+      "peak_power": 29,
+      "peak_duration": 14
+    }
+  ]
+}

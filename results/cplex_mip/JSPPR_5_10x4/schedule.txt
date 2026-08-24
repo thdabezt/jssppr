@@ -1,0 +1,10 @@
+Job 0: O0:M1,start=17,duration=72,end=89 | O1:M0,start=319,duration=87,end=406 | O2:M2,start=416,duration=66,end=482 | O3:M3,start=557,duration=60,end=617
+Job 1: O0:M3,start=0,duration=35,end=35 | O1:M0,start=157,duration=48,end=205 | O2:M2,start=509,duration=39,end=548 | O3:M1,start=548,duration=54,end=602
+Job 2: O0:M1,start=104,duration=46,end=150 | O1:M3,start=167,duration=20,end=187 | O2:M2,start=488,duration=21,end=509 | O3:M0,start=520,duration=97,end=617
+Job 3: O0:M0,start=53,duration=59,end=112 | O1:M3,start=365,duration=19,end=384 | O2:M1,start=454,duration=34,end=488 | O3:M2,start=575,duration=37,end=612
+Job 4: O0:M2,start=114,duration=73,end=187 | O1:M3,start=385,duration=25,end=410 | O2:M1,start=423,duration=24,end=447 | O3:M0,start=454,duration=28,end=482
+Job 5: O0:M3,start=35,duration=28,end=63 | O1:M0,start=112,duration=45,end=157 | O2:M1,start=210,duration=78,end=288 | O3:M2,start=299,duration=83,end=382
+Job 6: O0:M0,start=0,duration=53,end=53 | O1:M3,start=79,duration=71,end=150 | O2:M1,start=150,duration=37,end=187 | O3:M2,start=187,duration=12,end=199
+Job 7: O0:M2,start=206,duration=87,end=293 | O1:M3,start=293,duration=33,end=326 | O2:M1,start=368,duration=55,end=423 | O3:M0,start=482,duration=38,end=520
+Job 8: O0:M2,start=65,duration=49,end=114 | O1:M3,start=187,duration=83,end=270 | O2:M1,start=326,duration=40,end=366 | O3:M0,start=406,duration=48,end=454
+Job 9: O0:M2,start=0,duration=65,end=65 | O1:M3,start=150,duration=17,end=167 | O2:M0,start=205,duration=90,end=295 | O3:M1,start=295,duration=23,end=318

@@ -20,11 +20,14 @@ PREPROCESS = True
 
 # Horizon:
 #   "heuristic" uses Algorithm 1 and its verified schedule as a warm start.
-#   "cache" reads fixed bounds from UB_CACHE_FILE for comparable runs.
+#   "cache" reads the published bounds from UB_CACHE_FILE, so every backend
+#          starts from the horizon used for the reported results.
+#   "fixed" uses UPPER_BOUND for every instance.
 #   "safe" uses no initial upper bound or warm start.
 #   "dataset" trusts the bound stored in each instance file.
 HORIZON = "heuristic"
-UB_CACHE_FILE = PROJECT_ROOT / "initial_ub_cache.txt"
+UB_CACHE_FILE = PROJECT_ROOT / "published_upper_bounds.txt"
+UPPER_BOUND: Optional[int] = None
 HEURISTIC_TIME_LIMIT = 5.0
 HEURISTIC_SEED = 0
 
