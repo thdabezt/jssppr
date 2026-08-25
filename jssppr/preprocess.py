@@ -204,20 +204,17 @@ def prepare_instance(path: str | Path, solver: str) -> Preparation:
             )
         instance = with_horizon(dataset_instance, heuristic_ub)
         ub_source = horizon_mode
-        if str(config.BACKEND).lower() == "sat":
-            print(f"[{instance.name}] {ub_source} UB={heuristic_ub}")
-        else:
-            heuristic_started = time.perf_counter()
-            warm_start, heuristic_iterations = _heuristic_warm_start(
-                dataset_instance,
-                heuristic_ub,
-            )
-            heuristic_time = time.perf_counter() - heuristic_started
-            print(
-                f"[{instance.name}] {ub_source} UB={heuristic_ub} "
-                f"warm_start={'yes' if warm_start is not None else 'no'} "
-                f"time={heuristic_time:.6f}s"
-            )
+        heuristic_started = time.perf_counter()
+        warm_start, heuristic_iterations = _heuristic_warm_start(
+            dataset_instance,
+            heuristic_ub,
+        )
+        heuristic_time = time.perf_counter() - heuristic_started
+        print(
+            f"[{instance.name}] {ub_source} UB={heuristic_ub} "
+            f"warm_start={'yes' if warm_start is not None else 'no'} "
+            f"time={heuristic_time:.6f}s"
+        )
     elif horizon_mode == "safe":
         instance = with_horizon(dataset_instance, dataset_instance.safe_horizon)
         ub_source = "safe_horizon"
